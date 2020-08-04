@@ -1,0 +1,11 @@
+[master]
+master-01			ansible_ssh_host=10.10.64.6
+
+[node]
+node-01			        ansible_ssh_host=10.10.116.95
+
+
+[all:vars]
+ansible_connection=ssh
+ansible_ssh_user=root
+ansible_ssh_pass=""

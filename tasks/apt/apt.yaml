@@ -1,0 +1,7 @@
+- name: set apt insec repo 
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: config apt repo config
+    template: src=templates/80repoconf dest=/etc/apt/apt.conf.d/80repoconf owner=root group=root mode=0644

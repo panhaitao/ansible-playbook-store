@@ -1,0 +1,10 @@
+- name: Checking Pod Status
+  shell: "kubectl get pods --all-namespaces | grep -v Running | awk 'NR>1'"
+  register: pod_stats
+  until:
+    - 'pod_stats.stdout == ""'
+  retries: 200
+  delay: 10
+
+- name: Show Debug Info
+  debug: var=pod_stats verbosity=0

@@ -1,0 +1,15 @@
+#!/bin/bash
+helm upgrade --install prometheus-operator --namespace={{ cluster.namespace }} stable/prometheus-operator --set global.registry.address={{ cluster.registry }} --timeout=3000
+helm upgrade --install kube-prometheus --namespace {{ cluster.namespace }} stable/kube-prometheus --timeout=30000 \
+--set global.platform=ACE                                                                                         \
+--set prometheus.service.type=NodePort                                                                            \
+--set grafana.service.type=NodePort                                                                               \
+--set global.registry.address={{ cluster.init_ip }}:60080                                                         \
+--set alertmanager.configForACE.global.http_config.basic_auth.username={{ cluster.auth_username }}                \
+--set alertmanager.configForACE.global.http_config.basic_auth.password={{ cluster.auth_password }}                \
+--set alertmanager.configForACE.receivers[0].name=default-receiver                                                \
+--set alertmanager.configForACE.receivers[0].webhook_configs[0].send_resolved=false                               \
+--set alertmanager.configForACE.receivers[0].webhook_configs[0].url=http://{{ cluster.node_ip }}:32001/v1/alerts/{{ cluster.name }}/router \
+--set grafana.storageSpec.volumeClaimTemplate.spec.volumeName=grafana-nfs-pv         \
+--set prometheus.storageSpec.volumeClaimTemplate.spec.volumeName=prometheus-nfs-pv   \
+--set alertmanager.storageSpec.volumeClaimTemplate.spec.volumeName=alertmanager-nfs-pv

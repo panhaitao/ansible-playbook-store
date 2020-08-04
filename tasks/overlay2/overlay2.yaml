@@ -1,0 +1,7 @@
+- name: set lvm
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: set xfs
+    script: scripts/xfs.sh

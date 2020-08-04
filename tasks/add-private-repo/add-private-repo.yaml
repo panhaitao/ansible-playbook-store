@@ -1,0 +1,11 @@
+- name: install kubeadm
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: add extra repo 
+    template: src=templates/{{ item }} dest=/etc/apt/sources.list.d/{{ item }} owner=root group=root mode=0644
+    with_items:
+      - private-repo.list
+  - name: Update Repo Cache
+    command: "apt update"

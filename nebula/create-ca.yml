@@ -1,0 +1,9 @@
+- name: set all k8s nodes
+  hosts: localhost
+  user: root
+  gather_facts: no
+  tasks:
+    - include_role:
+        name: vpn-nebula
+      vars:
+        nebula_action: create_ca 

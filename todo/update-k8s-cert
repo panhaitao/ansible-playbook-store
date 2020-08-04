@@ -1,0 +1,10 @@
+- name: set all k8s nodes
+  hosts: all
+  user: root
+  gather_facts: no
+  tasks:
+    - include_role:
+        name: k8s-cert
+      vars:
+        master_group: master 
+        node_group: node

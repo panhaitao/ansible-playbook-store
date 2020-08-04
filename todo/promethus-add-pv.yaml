@@ -1,0 +1,49 @@
+- name: Update docker config
+  hosts: all
+  user: root
+  gather_facts: yes
+  tasks:
+    - include_role:
+        name: docker
+      vars:
+        master_group: master
+        node_group: node
+        action: config
+        registry:
+          - 10.213.111.1:60080
+          - index.alauda.cn
+        enable_metrics: true   
+- name: upgrade promethus
+  hosts: all
+  user: root
+  gather_facts: yes
+  tasks:
+    - include_role:
+        name: promethus
+      vars:
+        master_group: master
+        node_group: node
+        cluster:
+          name: gk8s
+          namespace: alauda-system
+          init_ip: 10.213.111.1
+          node_ip: 10.213.111.6
+          node_name: td-global-s01
+          nfs_server: 10.213.207.207
+          nfs_path: /alauda
+          registry: 10.213.111.1:60080
+          auth_username: cpaas
+          auth_password: Ceb@1234
+        storage:
+          prometheus:
+            pv_name: grafana-nfs-pv
+            pv_size: 35Gi
+            pv_sub_path: prometheus
+          alertmanager:
+            pv_name: alertmanager-nfs-pv
+            pv_size: 5Gi
+            pv_sub_path: alertmanager
+          grafana:
+            pv_name: grafana-nfs-pv
+            pv_size: 5Gi
+            pv_sub_path: grafana

@@ -1,0 +1,6 @@
+tasks/ake/mini-alauda*
+tasks/pkg-center/repo/*
+tasks/pkg-center/registry/*
+tasks/pkg-center/*.tar.gz
+PKG/*
+BAK/*

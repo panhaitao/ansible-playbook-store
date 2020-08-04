@@ -1,0 +1,68 @@
+- name: Config Init Host
+  hosts: "{{ init_host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: Gen /alauda/.run_chart_repo.sh 
+    template: src=templates/run_chart_repo.sh dest=/alauda/.run_chart_repo.sh owner=root group=root mode=0644
+  - name: Gen /alauda/.run_kaldr.sh 
+    template: src=templates/run_kaldr.sh dest=/alauda/.run_kaldr.sh owner=root group=root mode=0644
+  - name: Remove all docker continers
+    script: scripts/clean_continers.sh 
+  - name: Reconfig Init Hosts 
+    shell: 'sh /alauda/.run_chart_repo.sh && sh /alauda/.run_kaldr.sh'
+  - name: Helm upgrade  
+    shell: "sh {{  pkg_dir }}/helm_upgrade.sh" 
+- name: Config Master Host
+  hosts: "{{ master_host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: sync migrate.sh
+    copy:
+      src=scripts/{{ ace_tag }}-migrate.sh
+      dest=/root/{{ ace_tag }}-migrate.sh
+  - name: sync images    
+    copy:
+      src=images/{{ item }}
+      dest=/root/{{ item }}
+    with_items:
+      - link-1.14.11.tar.gz
+      - portal-v1.3.6.tar.gz
+      - dex-v0.1.16.tar.gz
+      - morgans.tar.gz
+  - name: Gen /root/load_image.sh 
+    template: src=templates/load_image.sh dest=/root/load_image.sh owner=root group=root mode=0644
+  - name: run /root/load_image.sh 
+    shell: "sh /root/load_image.sh"
+  - name: Gen /root/update_image.sh 
+    template: src=templates/update_image.sh dest=/root/update_image.sh owner=root group=root mode=0644
+  - name: run /root/update_image.sh 
+    shell: "sh /root/update_image.sh"
+  - name: wait for k8s cluster  ready
+    shell: "kubectl get pods --all-namespaces | grep -v Running | awk 'NR>1'"
+    register: cluster_stats
+    until:
+      - 'cluster_stats.stdout == ""'
+    retries: 50
+    delay: 5
+#  - name: Show Debug Info
+#    debug: var=cluster_stats verbosity=0
+#  - name: Run DB migrate.sh  
+#    shell: sh /root/{{ ace_tag }}-migrate.sh 
+#  - name: Jakiro POD exec syncrole   
+#    script: scripts/jakiro-exec.sh 
+#  - name: Heimall POD exec syncrole   
+#    script: scripts/heimdall-exec.sh  
+#  - name: Gen update_label.sh 
+#    template: src=templates/update_label.sh dest=/root/update_label.sh owner=root group=root mode=0644
+#  - name: Run update_label.sh  
+#    shell: sh /root/update_label.sh 
+#  - name: Restart all Alauda POD  
+#    script: scripts/restart_alauda.sh 
+#      bash ace-2.5-migrate.sh
+#      python manage.py syncroles -o cpaas
+#      2.8:  curl -v -X PUT http://localhost:80/v3/schemas/convert_schema/view_action
+#      2.8   curl -v -X PUT http://localhost:80/v3/roles/convert_template/view_action
+#      2.8   curl -v -X PUT http://localhost:80/v3/roles/convert_roles/view_action
+#      curl -v -X PUT -u cpaas:cpaasCeb@123 http://10.213.107.209:32001/v2/kubernetes/clusters/ace/update_label

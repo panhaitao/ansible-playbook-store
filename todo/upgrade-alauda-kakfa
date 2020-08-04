@@ -1,0 +1,12 @@
+- name: set all k8s nodes
+  hosts: all
+  user: root
+  gather_facts: yes
+  tasks:
+    - include_role:
+        name: kakfa
+      vars:
+        master_group: master 
+        master_group: node
+        zk_image: index.alauda.cn/alaudaorg/zookeeper:CEB 
+        kafka_image: index.alauda.cn/alaudaorg/kafka:CEB

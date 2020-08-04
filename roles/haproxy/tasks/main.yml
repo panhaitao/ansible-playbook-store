@@ -1,0 +1,28 @@
+- name: Update Repo Cache
+  shell: "yum makecache" 
+- name: Install Required Packages
+  shell: "yum install {{ item }} -y"
+  with_items:
+    - haproxy
+  notify:
+    - Enable haproxy service
+  when: inventory_hostname in groups[lb_group]
+
+- name: config haproxy
+  template: src=templates/haproxy.cfg dest=/etc/haproxy/haproxy.cfg owner=root group=root mode=0644
+  notify:
+    - Restart haproxy service
+  when: inventory_hostname in groups[lb_group]
+
+- name: Ensure haproxy is Running
+  shell: "systemctl restart haproxy && systemctl enable haproxy"
+
+- name: Check haproxy status
+  shell: "systemctl status haproxy"
+  register: haproxy_stats
+  until:
+    - 'haproxy_stats.rc == 0'
+  retries: 5
+  delay: 1
+- name: Show Debug Info
+  debug: var=haproxy_stats verbosity=0

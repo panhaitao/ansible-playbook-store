@@ -1,0 +1,31 @@
+- name: set lb
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: Update Repo Cache
+    command: "yum makecache"
+  - name: Install Required Packages
+    command: "yum install {{ item }} -y"
+    with_items:
+      - keepalived
+  - name: add keepalived config
+    template: src=templates/keepalived.conf dest=/etc/keepalived/keepalived.conf owner=root group=root mode=0644
+    notify:
+      - Restart service
+
+  - name: add track script
+    template: src=templates/check_haproxy.sh dest=/etc/keepalived/check_haproxy.sh owner=root group=root mode=0755
+    notify:
+      - Restart service
+
+  - name: Enable service
+    command: "systemctl enable {{ item }}"
+    with_items:
+      - keepalived
+
+  handlers:
+    - name: Restart service
+      command: "systemctl restart {{ item }}"
+      with_items:
+        - keepalived

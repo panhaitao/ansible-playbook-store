@@ -1,0 +1,11 @@
+- name: init flannel cni plugin
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: gen CNI flannel config 
+    template: src=templates/{{ item }} dest=/var/spool/{{ item }} owner=root group=root mode=0644
+    with_items:
+      - kube-flannel-v0.11.yaml
+  - name: add CNI flannel plugin
+    shell: "kubectl apply -f /var/spool/kube-flannel-v0.11.yaml"  

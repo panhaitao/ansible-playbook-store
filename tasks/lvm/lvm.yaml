@@ -1,0 +1,13 @@
+- name: set lvm
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: Update Repo Cache
+    command: "yum makecache"
+  - name: Install Required Packages
+    command: "yum install {{ item }} -y"
+    with_items:
+      - lvm2
+  - name: set lvm
+    script: scripts/lvm.sh

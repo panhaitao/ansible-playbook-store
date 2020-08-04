@@ -1,0 +1,34 @@
+{%- set k8s_cha = cha_ip -%}
+{%- set pkg_ip  = pkg_ip -%}
+apiVersion: kubeadm.k8s.io/v1alpha1
+kind: MasterConfiguration
+api:
+  advertiseAddress: "{{ k8s_cha }}"
+  controlPlaneEndpoint: "{{ k8s_cha }}"
+  bindPort: 6443
+etcd:
+  endpoints:
+  {% for item in groups['master'] %}
+  - "http://{{ hostvars[item].ansible_ssh_host }}:2379"
+  {% endfor %}
+  certSANs:
+
+networking:
+  podSubnet: "10.244.0.0/16"
+kubernetesVersion: "v1.9.6"
+apiServerCertSANs:
+{% for item in groups['master'] %}
+- "{{ item }}"
+- "{{ hostvars[item].ansible_ssh_host }}"
+{% endfor %}
+- "{{ k8s_cha }}"
+
+imageRepository: "{{ pkg_ip }}:5000"
+apiServerExtraArgs:
+  advertise-address: "{{ k8s_cha }}"
+  insecure-port: "8080"
+  admission-control: "Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,ResourceQuota"
+featureGates:
+  HighAvailability: True
+  SelfHosting: True
+  StoreCertsInSecrets: True

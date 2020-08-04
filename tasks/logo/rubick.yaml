@@ -1,0 +1,11 @@
+- name: Set rubick logo
+  hosts: "{{ host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: sync rubick logo configmap yaml 
+    template: src=templates/rubick-logo-cebbank.yaml dest=/tmp/rubick-logo-cebbank.yaml owner=root group=root mode=0644
+  - name: apply rubick logo configmap 
+    shell: "kubectl apply -f /tmp/rubick-logo-cebbank.yaml"
+  - name: restart rubick 
+    script: script/restart-rubick.sh  

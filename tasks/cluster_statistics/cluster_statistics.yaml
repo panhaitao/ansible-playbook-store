@@ -1,0 +1,51 @@
+- name: cluster Resources count
+  hosts: all
+  user: root
+  gather_facts: no
+  tasks:
+  - name: get_node_cpu_total
+    shell: "nproc"  
+    register: node_cpu_total
+
+  - name: get_node_mem_total
+    shell: free -m | grep Mem | awk '{print $2}'  
+    register: node_mem_total
+
+  - name: node_cpu_total set_fact
+    set_fact:
+      cpu_total: "{{ node_cpu_total.stdout }}"
+
+  - name: node_mem_total set_fact
+    set_fact:
+      mem_total: "{{ node_mem_total.stdout }}"
+
+- name: check cluster stats
+  hosts: "{{ master }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: cluster_pod_count
+    shell: kubectl get pods --all-namespaces | wc | awk '{print $1}' 
+    register: cluster_pod_count
+
+
+  - name: Show cluser stats
+    vars:
+      msg: |
+           cluster os count :
+           ------------------------------------
+           {% set cluster_cpu_total = 0 %}
+           {% set cluster_mem_total = 0 %}
+           {% for item in groups['all'] %} 
+             {% cluster_cpu_total= cluster_cpu_total+hostvars[item].cpu_total %}
+             {% cluster_mem_total= cluster_mem_total+hostvars[item].mem_total %}
+           {% endfor %}
+             cluster_mem_total(Cores) : {{ cluster_cpu_total }}
+             cluster_mem_total(GB): {{ cluster_mem_total / 1024 }}
+             
+           pods_count:
+           ------------------------------------
+           "{{ cluster_pod_count.stdout }}"
+
+    debug:
+      msg: "{{ msg.split('\n') }}"

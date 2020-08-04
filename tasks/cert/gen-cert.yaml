@@ -1,0 +1,9 @@
+- name: gen all certs
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: clear old certs 
+    shell: "rm -rf /etc/kubernetes/pki"
+  - name: gen all certs 
+    shell: "kubeadm init phase certs all --config=/var/spool/kubeadm-init.yaml"

@@ -1,0 +1,28 @@
+- hosts: all
+  user: root
+  gather_facts: false
+  tasks:
+  - name: set hosts
+    shell: ' echo "10.10.184.169 myhub.com" >> /etc/hosts '
+  - name: clean cert
+    shell: "rm  /tmp/domain.crt  -f"
+  - name: rsync ca cert
+    copy:
+      src=/data/certs/{{ item }}
+      dest=/tmp/{{ item }}
+    with_items:
+      - domain.crt
+      - cluster-configuration.yaml
+      - kubesphere-installer.yaml
+  - name: apply cert
+    shell: "cat /tmp/domain.crt  >> /etc/pki/tls/certs/ca-bundle.crt"
+  - name: restart docker
+    shell: "systemctl restart docker"
+  - name: clean cert again
+    shell: "rm  /tmp/domain.crt  -f"
+  - name: login registry
+    shell: 'docker login -u admin -p "a4h3ljbn" myhub.com'
+  - name: set kubelet pull-image-perm
+    shell: "unalias  cp;cp /root/.docker/config.json /var/lib/kubelet/ -f"
+  - name: restart kubelet service
+    shell: "systemctl daemon-reload && systemctl restart kubelet"

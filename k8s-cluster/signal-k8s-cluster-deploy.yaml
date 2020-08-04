@@ -1,0 +1,14 @@
+- import_playbook: tasks/ssh/ssh-key.yaml hostgroup=all
+- import_playbook: tasks/hosts/change-hostname.yaml hostgroup=all
+- import_playbook: tasks/hosts/hosts.yaml hostgroup=all
+- import_playbook: tasks/apt/apt.yaml hostgroup=all
+
+- import_playbook: tasks/pkg-center/pkg-center.yaml hostgroup=xz
+- import_playbook: tasks/add-private-repo/add-private-repo.yaml hostgroup=xz
+- import_playbook: tasks/docker/docker.yaml hostgroup=xz
+- import_playbook: tasks/kubeadm/kubeadm.yaml hostgroup=xz
+- import_playbook: tasks/config-kubeadm/config-kubeadm.yaml hostgroup=xz
+- import_playbook: tasks/init-master/init-signal.yaml hostgroup=xz
+- import_playbook: tasks/init-master/set-kubectl-config.yaml hostgroup=xz
+- import_playbook: tasks/init-master-post-action/init-master-post-action.yaml hostgroup=xz
+- import_playbook: tasks/cni-flannel/cni-flannel.yaml hostgroup=xz

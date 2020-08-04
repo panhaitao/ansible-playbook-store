@@ -1,0 +1,2 @@
+- name: join cluster nodes
+  shell: "{{ hostvars[groups[master_group][0]].join_command }}" 

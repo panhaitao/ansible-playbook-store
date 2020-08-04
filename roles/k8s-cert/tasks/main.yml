@@ -1,0 +1,54 @@
+- name: Backup master kubernetes conf
+  script: files/backup-k8s-conf.sh 
+  when: inventory_hostname in groups[master_group]
+- name: Backup node kubernetes conf
+  script: files/backup-k8s-conf.sh 
+  when: inventory_hostname in groups[node_group]
+
+- name: update apiserver cert  
+  script: files/master-cert-apiserver.sh
+  when: inventory_hostname in groups[master_group]  
+
+- name: Update etcd cert
+  script: files/master-cert-etcd.sh
+  when: inventory_hostname in groups[master_group] 
+
+- name: Fetch kubeadmcfg.yaml
+  fetch:
+    src: /etc/kubeadm/kubeadmcfg.yaml
+    dest: /tmp/kubeadmcfg.yaml
+    flat: yes
+  when: ( inventory_hostname in groups[master_group] ) and ( inventory_hostname in groups[master_group][0] )
+- name: Mkdir /etc/kubeadmin/
+  shell: "rm -rvf /etc/kubeadmin/ && mkdir -pv /etc/kubeadmin/"
+  when: inventory_hostname in groups[master_group]
+- name: Sync kubeadmcfg.yaml
+  template:
+    src: /tmp/kubeadmcfg.yaml
+    dest: /etc/kubeadmin/kubeadmcfg.yaml
+  when: inventory_hostname in groups[master_group]
+- name: Update kubernetes conf
+  script: files/update-k8s-conf.sh 
+  when: inventory_hostname in groups[master_group]
+
+- name: Fetch CA cert
+  fetch:
+    src: /etc/kubernetes/pki/ca.key
+    dest: /tmp/ca.key
+    flat: yes
+  when: ( inventory_hostname in groups[master_group] ) and ( inventory_hostname in groups[master_group][0] )
+
+- name: Clean old CA key
+  shell: "rm -rvf /etc/kubernetes/pki/ca.key"
+  when: inventory_hostname in groups[node_group] 
+- name: Sync new CA cert
+  template: src=/tmp/ca.key dest=/etc/kubernetes/pki/ca.key owner=root mode=0400
+  when: inventory_hostname in groups[node_group] 
+
+- name: Update node cert
+  script: files/node-cert.sh
+  when: inventory_hostname in groups[node_group] 
+
+- name: Run master post script
+  script: files/master-cert-post.sh
+  when: ( inventory_hostname in groups[master_group] ) and ( inventory_hostname in groups[master_group][0] )

@@ -1,0 +1,19 @@
+- name: Set etc hosts 
+  import_tasks: set_etc_hosts.yml
+
+- name: Set etc hostname
+  import_tasks: set_etc_hostname.yml
+  when: update_etc_hostname |lower == 'yes'
+
+- name: Install Required Packages  
+  import_tasks: set_packages.yml
+- name: Set firewalld 
+  import_tasks: set_firewalld.yml
+- name: Set swapfs 
+  import_tasks: set_swapfs.yml
+- name: Set ipvs 
+  import_tasks: set_ipvs.yml
+- name: Set ip_forward 
+  import_tasks: set_ip_forward.yml
+- name: Set selinux 
+  import_tasks: set_selinux.yml

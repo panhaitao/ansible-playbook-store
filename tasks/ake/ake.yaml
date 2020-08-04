@@ -1,0 +1,29 @@
+- name: sync repo index
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: Update Repo Cache
+    command: "yum makecache"
+  - name: Install Required Packages
+    command: "yum install {{ item }} -y"
+    with_items:
+      - rsync
+  - name: sync ake deploy pkg
+    synchronize: src=mini-alauda/ dest=/root/mini-alauda/ delete=yes recursive=yes
+  - name: set daemon.json config 
+    template: src=templates/daemon.overlay2 dest=/root/mini-alauda/daemon.json owner=root group=root mode=0644
+  - name: gen init-ake.sh 
+    template: src=templates/init-ake.sh dest=/root/mini-alauda/init-ake.sh owner=root group=root mode=0755
+  - name: run init-ake.sh
+    shell: "cd /root/mini-alauda/ && bash init-ake.sh"
+  - name: update alauda repo
+    template: src=templates/alauda.repo dest=/etc/yum.repos.d/alauda.repo owner=root group=root mode=0644
+  - name: update yum repo index
+    shell: "yum makecache"
+  - name: set key 
+    template: src=~/.ssh/id_rsa dest=~/.ssh/id_rsa owner=root group=root mode=0400
+  - name: gen scripts/k8s-deploy.sh 
+    template: src=templates/k8s-deploy.sh dest=/root/mini-alauda/k8s-deploy.sh owner=root group=root mode=0755
+  - name: run scripts/k8s-deploy.sh 
+    shell: "systemctl restart kubelet && cd /root/mini-alauda/ && bash k8s-deploy.sh"

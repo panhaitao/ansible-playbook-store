@@ -1,0 +1,3 @@
+- name: stop firewalld 
+  shell: "systemctl stop firewalld.service && systemctl  disable firewalld.service"
+  when: firewalld |lower == 'disable'

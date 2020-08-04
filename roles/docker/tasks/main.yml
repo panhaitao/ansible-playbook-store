@@ -1,0 +1,6 @@
+- name: Install Docker Packages  
+  import_tasks: install_docker.yml
+  when: ( action = install ) and ( inventory_hostname in groups[master_group] ) or ( inventory_hostname in groups[node_group] ) 
+- name: Set Docker Config 
+  import_tasks: set_docker.yml
+  when: ( action = config ) and ( inventory_hostname in groups[master_group] ) or ( inventory_hostname in groups[node_group] ) 

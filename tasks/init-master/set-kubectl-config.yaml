@@ -1,0 +1,19 @@
+- name: set kubectl config
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: create .kube directory
+    become: yes
+    become_user: root
+    file:
+      path: $HOME/.kube
+      state: directory
+      mode: 0755
+
+  - name: copy admin.conf to user's kube config
+    copy:
+      src: /etc/kubernetes/admin.conf
+      dest: /root/.kube/config
+      remote_src: yes
+      owner: root

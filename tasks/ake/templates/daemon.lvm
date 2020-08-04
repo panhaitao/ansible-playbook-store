@@ -1,0 +1,19 @@
+{
+    "insecure-registries": [
+        "{{ hostvars[inventory_hostname].ansible_ssh_host }}:60080"
+    ],
+    "storage-driver": "devicemapper",
+    "storage-opts": [
+        "dm.thinpooldev=/dev/mapper/docker-thinpool",
+        "dm.min_free_space=0%",
+        "dm.use_deferred_deletion=true",
+        "dm.use_deferred_removal=true",
+        "dm.fs=ext4"
+    ],
+    "log-driver": "json-file",
+    "log-opts": {
+      "max-size": "20m",
+      "max-file": "10"
+    },
+    "graph": ""
+}

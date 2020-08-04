@@ -1,0 +1,34 @@
+- hosts: "{{ master_host }}"
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: get join command
+      shell: kubeadm token create --print-join-command
+      register: join_command_raw
+
+    - name: set join command
+      set_fact:
+        join_command: "{{ join_command_raw.stdout_lines[0] }}"
+
+    - name: get certificate key raw
+      shell: kubeadm init phase upload-certs --experimental-upload-certs
+      register: certificate_key_raw
+
+    - name: get certificate key
+      set_fact:
+        cert_key: "{{ certificate_key_raw.stdout_lines[-1] }}"
+
+- hosts: "{{ master_group }}"
+  become: yes
+  tasks:
+    - name: join master nodes
+      shell: "{{ hostvars[master_host].join_command }} --experimental-control-plane --certificate-key {{ hostvars[master_host].cert_key }}"
+      when: inventory_hostname not in groups[master_group][0]
+- hosts: "{{ node_group }}"
+  become: yes
+  tasks:
+    - name: join cluster nodes
+      shell: "{{ hostvars[master_host].join_command }}"
+      #      args:
+      #  chdir: $HOME
+      #  creates: node_joined.txt

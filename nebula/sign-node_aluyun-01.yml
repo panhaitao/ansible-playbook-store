@@ -1,0 +1,11 @@
+- name: set all k8s nodes
+  hosts: localhost
+  user: root
+  gather_facts: no
+  tasks:
+    - include_role:
+        name: vpn-nebula
+      vars:
+        nebula_action: sign_node
+        node_name: aluyun-01
+        node_ipv4: "192.168.168.3/24"

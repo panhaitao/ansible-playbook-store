@@ -1,0 +1,10 @@
+- name: init master cluster
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: run kubeadm init script 
+    shell: "systemctl restart kubelet && kubeadm init --config /var/spool/kubeadm-init.yaml --experimental-upload-certs"
+    #ignore_errors: yes
+    #async: 240
+    #poll: 5

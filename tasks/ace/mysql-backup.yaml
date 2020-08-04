@@ -1,0 +1,11 @@
+- name: DB Host
+  hosts: "{{ group }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: create backup dir 
+    shell: "mkdir -pv /mysqldata/backup"
+  - name: Gen mysql backup script
+    template: src=templates/mysql-backup.sh dest=/tmp/mysql-backup.sh owner=root group=root mode=0755
+  - name: run mysql backup script
+    shell: "bash /tmp/mysql-backup.sh"

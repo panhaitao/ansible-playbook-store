@@ -1,0 +1,34 @@
+- import_playbook: tasks/ssh/ssh-key.yaml hostgroup=all
+- import_playbook: tasks/hosts/change-hostname.yaml hostgroup=all
+- import_playbook: tasks/hosts/hosts.yaml hostgroup=all
+- import_playbook: tasks/apt/apt.yaml hostgroup=all
+
+- import_playbook: tasks/lb/lb.yaml hostgroup=lb
+
+- import_playbook: tasks/pkg-center/pkg-center.yaml hostgroup=master1
+
+- import_playbook: tasks/add-private-repo/add-private-repo.yaml hostgroup=master
+- import_playbook: tasks/add-private-repo/add-private-repo.yaml hostgroup=node
+
+- import_playbook: tasks/docker/docker.yaml hostgroup=master
+- import_playbook: tasks/docker/docker.yaml hostgroup=node
+
+- import_playbook: tasks/kubeadm/kubeadm.yaml hostgroup=master
+- import_playbook: tasks/kubeadm/kubeadm.yaml hostgroup=node
+
+
+- import_playbook: tasks/config-kubeadm/config-kubeadm-cluster.yaml hostgroup=master1
+- import_playbook: tasks/init-master/init-master.yaml hostgroup=master1
+
+- import_playbook: tasks/add-nodes/add-nodes.yaml master_host=master1 master_group=master node_group=node
+- import_playbook: tasks/init-master/set-kubectl-config.yaml hostgroup=master
+- import_playbook: tasks/set-nodes-label/set-nodes-label.yaml master_host=master1
+- import_playbook: tasks/cni-flannel/cni-flannel.yaml hostgroup=master1
+
+#- import_playbook: tasks/config-kubeadm/config-kubeadm-cluster.yaml hostgroup=master1
+#- import_playbook: tasks/config-kubeadm/config-kubeadm-cluster.yaml hostgroup=ops
+#- import_playbook: tasks/cert/gen-cert.yaml hostgroup=ops
+#- import_playbook: tasks/cert/sync-cert.yaml hostgroup=master
+#- import_playbook: tasks/etcd/etcd.yaml hostgroup=master
+#- import_playbook: tasks/init-master/init-master.yaml hostgroup=master
+#- import_playbook: tasks/init-master/set-kubectl-config.yaml hostgroup=master

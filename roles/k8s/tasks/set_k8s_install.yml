@@ -1,0 +1,13 @@
+- name: Add Repo
+  template: src=templates/kubernetes.repo dest=/etc/yum.repos.d/kubernetes.repo owner=root group=root mode=0644
+- name: update Repo Cache
+  command: "yum makecache"
+- name: Install Packages
+  command: "yum install {{ item }} -y"
+  with_items:
+    - kubelet-{{ version }}
+    - kubeadm-{{ version }}
+    - kubectl-{{ version }}
+  notify:
+    - Enable kubelet service
+    - Restart kubelet service

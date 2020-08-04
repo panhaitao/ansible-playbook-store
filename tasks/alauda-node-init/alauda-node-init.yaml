@@ -1,0 +1,26 @@
+- name: init alauda node config
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: Update Repo Cache
+    command: "yum makecache"
+  - name: Install Required Packages
+    command: "yum install {{ item }} -y"
+    with_items:
+      - jq
+      - sshpass
+  - name: set lvm
+    script: scripts/lvm.sh
+#  - name: load kernel mod
+#    shell: "modprobe br_netfilter"
+#  - name: update sysctl config
+#    template: src=templates/sysctl.conf dest=/etc/sysctl.conf owner=root group=root mode=0644
+#  - name: set sysctl config
+#    shell: "sysctl -p"
+#  - name: disable swap  
+#    script: scripts/disable-swap.sh
+#  - name: disable firewalld
+#    shell: "systemctl stop firewalld.service; systemctl disable firewalld.service"
+#  - name: reboot host
+#    shell: "reboot"

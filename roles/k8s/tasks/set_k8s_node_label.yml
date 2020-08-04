@@ -1,0 +1,3 @@
+- name: set cluster nodes label
+  shell: "kubectl label node --overwrite {{ item }} node-role.kubernetes.io/node="
+  with_items: "{{ groups[node_group] }}"

@@ -1,0 +1,11 @@
+- name: copy cleanup.sh 
+  hosts: "all"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: sync repo    
+    copy:
+      src={{ item }}
+      dest=/root/{{ item }}
+    with_items:
+      - cleanup.sh 

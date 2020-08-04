@@ -1,0 +1,35 @@
+- name: Sync kubebin for all nodes
+  hosts: "{{ group }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: clean tmp dir
+    shell: "rm /tmp/kube* -rvf"
+  - name: sync kubebin   
+    copy:
+      src=images/1.13.3/{{ item }}
+      dest=/tmp/{{ item }}
+    with_items:
+      - kubeadm
+      - kubectl
+      - kubelet
+  - name: install kubelet   
+    shell: "alias cp; cp /tmp/kubelet /usr/local/sbin/ -f" 
+  - name: install kubectl   
+    shell: "alias cp; cp /tmp/kubectl /usr/local/sbin/ -f" 
+  - name: install kubeadm   
+    shell: "alias cp; cp /tmp/kubeadm /usr/local/sbin/ -f" 
+  - name: chmod kube-bin 755  
+    shell: "chmod 755 /usr/local/sbin/*" 
+  - name: install kubelet.service
+    template: src=templates/kubelet.service dest=/etc/systemd/system/kubelet.service owner=root group=root mode=0644
+  - name: restart kubelet service  
+    shell: "systemctl daemon-reload && systemctl restart kubelet" 
+  - name: set node label
+    shell: "kubectl label nodes <node-name> <label-key>=<label-value> --overwrite"
+  - name: echo k8s version   
+    shell: "kubectl version" 
+    register: k8s_version
+    ignore_errors: yes
+  - name: Show Debug Info
+    debug: msg={{ k8s_version.stdout_lines }}

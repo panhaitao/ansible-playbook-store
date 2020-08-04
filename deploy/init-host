@@ -1,0 +1,14 @@
+bs-gk8s-init: 
+  docker restart chart-repo  yum  pkg-registry
+  mount -o ro 10.1.250.22:/cpaas_initk8s_gs_repo /mnt/cpaas_repo/
+
+as-gk8s-init:
+  docker restart chart-repo  yum  pkg-registry
+  mount -o ro 10.1.250.22:/cpaas_initk8s_gs_repo /mnt
+
+
+gk8s-init:
+  docker restart chart-repo  yum  pkg-registry
+  mount -o vers=3 10.200.240.2:/Cpaas_repo_volTS2 /mnt02/
+  mount 10.213.117.195:/Cpaas_ops_nfsTS5 /cpaas_ops/
+  mount -t nfs 10.200.240.1:/Cpaas_docker_repo_volTS1 /alauda/syncImage/

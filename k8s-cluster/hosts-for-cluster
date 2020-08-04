@@ -1,0 +1,19 @@
+[lb]
+lb1		ansible_ssh_host=172.26.84.160 role=MASTER vrrp_id=51 vip=172.26.84.11
+
+[master]
+master1		ansible_ssh_host=172.26.84.161 
+master2		ansible_ssh_host=172.26.84.162
+
+
+[node]
+node1		ansible_ssh_host=172.26.84.163
+node2		ansible_ssh_host=172.26.84.164
+
+[all:vars]
+ansible_connection=ssh
+ansible_ssh_user=root
+ansible_ssh_pass=""
+cha_ip=172.26.84.160
+pkg_ip=172.26.84.161
+pod_subnet=10.244.0.0/16

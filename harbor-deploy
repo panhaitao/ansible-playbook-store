@@ -1,0 +1,41 @@
+REGISTRY=$(docker info |grep 60080 |tr -d ' ')
+NODE_IP="1.1.1.1"                               ######此参数为部署时指定的访问地址，写当前集群中任意⼀个master节点的ip即可
+database_pvc=habordatabase                      ###harbor数据库使⽤的pvc，需要事先在default下创建这
+个pvc
+redis_pvc=harborredis                           ###harbor的redis使⽤的pvc，需要事先在default下创建
+这个pvc
+chartmuseum_pvc=harbormuseum                    ###harbor使⽤的pvc，需要事先在default下创建这个
+pvc
+registry_pvc=harborregistry                     ###harbor的registry使⽤的pvc，需要事先在
+default下创建这个pvc
+jobservice_pvc=harborjob                        ###harbor使⽤的pvc，需要事先在default下创建这个
+pvc
+harbor_password="Harbor12345"                   ####harbor的密码，默认不需要修改，若有规划，可改
+db_password="Harbor4567"                        ####harbor数据库的密码，默认不需要修改，若有规划，
+可改
+redis_password="Redis789"                       ###harbor的redis的密码，默认不需要修改，若有规划，可改
+ 
+ 
+helm install --name harbor --namespace default stable/harbor \
+ --set global.registry.address=${REGISTRY} \
+ --set externalURL=http://${NODE_IP}:31104 \
+ --set harborAdminPassword=$harbor_password \
+ --set ingress.enabled=false \
+ --set service.type=NodePort \
+ --set service.ports.http.nodePort=31104 \
+ --set service.ports.ssh.nodePort=31105 \
+ --set service.ports.https.nodePort=31106 \
+ --set database.password=$db_password \
+ --set redis.usePassword=true \
+ --set redis.password=$redis_password \
+ --set database.persistence.enabled=true \
+ --set database.persistence.existingClaim=${database_pvc} \
+ --set redis.persistence.enabled=true \
+ --set redis.persistence.existingClaim=${redis_pvc} \
+ --set chartmuseum.persistence.enabled=true \
+ --set chartmuseum.persistence.existingClaim=${chartmuseum_pvc} \
+ --set registry.persistence.enabled=true \
+ --set registry.persistence.existingClaim=${registry_pvc} \
+ --set jobservice.persistence.enabled=true \
+ --set jobservice.persistence.existingClaim=${jobservice_pvc} \
+ --set AlaudaACP.Enabled=false

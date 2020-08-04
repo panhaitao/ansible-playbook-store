@@ -1,0 +1,11 @@
+- name: Init k8s cluster
+  shell: "kubeadm init --config=/var/lib/kubeadm-init.yml --upload-certs"
+
+- name: Reinit k8s cluster
+  shell: "kubeadm init --config=/var/lib/kubeadm-init.yml --upload-certs"
+
+- name: Enable kubelet service
+  shell: "systemctl enable kubelet"
+
+- name: Restart kubelet service
+  shell: "systemctl restart kubelet"

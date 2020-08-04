@@ -1,0 +1,66 @@
+pki:
+  ca: /etc/nebula/ca.crt
+  cert: /etc/nebula/{{ node_name }}.crt
+  key: /etc/nebula/{{ node_name }}.key
+
+static_host_map:
+  {{ lighthouse_ip }}: ["{{ lighthouse_endpoint }}"]
+  {{ hostvars[inventory_hostname].vpn_ovelay_ip }}: ["{{ hostvars[inventory_hostname].ansible_ssh_host }}":4242]
+
+lighthouse:
+  am_lighthouse: false
+  interval: 60
+  hosts:
+    - "{{ lighthouse_ip }}"
+
+listen:
+  host: 0.0.0.0
+  port: 4242
+  #batch: 64
+  #read_buffer: 10485760
+  #write_buffer: 10485760
+
+punchy: true
+punch_back: true
+#  cipher: chachapoly
+#local_range: "172.16.0.0/24"
+
+tun:
+  dev: nebula1
+  drop_local_broadcast: false
+  drop_multicast: false
+  tx_queue: 500
+  mtu: 1300
+  routes:
+    #- mtu: 8800
+    #  route: 10.0.0.0/16
+  unsafe_routes:
+    #- route: 172.16.1.0/24
+    #  via: 192.168.100.99
+    #  mtu: 1300  #mtu will default to tun mtu if this option is not sepcified
+
+logging:
+  # panic, fatal, error, warning, info, or debug. Default is info
+  level: debug
+  # json or text formats currently available. Default is text
+  format: text
+
+# Nebula security group configuration
+firewall:
+  conntrack:
+    tcp_timeout: 120h
+    udp_timeout: 3m
+    default_timeout: 10m
+    max_connections: 100000
+
+  outbound:
+    # Allow all outbound traffic from this node
+    - port: any
+      proto: any
+      host: any
+
+  inbound:
+    # Allow icmp between any nebula hosts
+    - port: any
+      proto: any
+      host: any

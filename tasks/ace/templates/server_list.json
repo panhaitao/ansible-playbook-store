@@ -1,0 +1,42 @@
+[
+{%- for item in groups['master'] %}
+  {
+    "server_role": {
+      "master": true,
+      "test": false 
+    },
+    "ip_addr": "{{ hostvars[item]['ansible_ssh_host'] }}",
+    "ssh_port": "22",
+    "ssh_user": "root",
+    "ssh_passwd": "{{ ansible_ssh_pass }}",
+    "ssh_key_file": "/root/.ssh/id_rsa"
+  },
+  {%- endfor -%}
+  {%- for item in groups['node'] -%}{%- if loop.index0 in [0,1,2] %}
+  {
+    "server_role": {
+      "global": true,
+      "redis": true, 
+      "test": false 
+     },
+    "ip_addr": "{{ hostvars[item]['ansible_ssh_host'] }}",
+    "ssh_port": "22",
+    "ssh_user": "root",
+    "ssh_passwd": "{{ ansible_ssh_pass }}",
+    "ssh_key_file": "/root/.ssh/id_rsa"
+  },{%- else %}
+  {
+    "server_role": {
+      "global": true,
+      "log": true, 
+      "redis": true, 
+      "test": false 
+    },
+    "ip_addr": "{{ hostvars[item]['ansible_ssh_host'] }}",
+    "ssh_port": "22",
+    "ssh_user": "root",
+    "ssh_passwd": "{{ ansible_ssh_pass }}",
+    "ssh_key_file": "/root/.ssh/id_rsa"
+  }{%- if not loop.last -%},{%- endif -%}
+{%- endif -%}{% endfor %}
+]

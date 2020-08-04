@@ -1,0 +1,7 @@
+- name: Config Init Host
+  hosts: "{{ init_host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: add server list json
+    template: src=templates/server_list.json dest={{  pkg_dir }}/server_list.json owner=root group=root mode=0644

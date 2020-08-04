@@ -1,0 +1,11 @@
+- name: init etcd cluster
+  hosts: "{{ group }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: Create backup dir
+    shell: "mkdir -pv /root/backup/"
+  - name: Gen etcd backup script
+    template: src=templates/etcd-snapshot-backup-v3.sh dest=/root/etcd-snapshot-backup-v3.sh owner=root group=root mode=0755
+  - name: run etcd backup script
+    shell: "bash /root/etcd-snapshot-backup-v3.sh"

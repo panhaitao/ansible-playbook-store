@@ -1,0 +1,17 @@
+- name: k8s master upgrade 
+  hosts: "{{ host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: add exec perm   
+    shell: "chmod 755 /tmp/kubeadm" 
+  - name: upgrade   
+    shell: "/tmp/kubeadm upgrade apply v1.13.10 -y" 
+  - name: stop kubelet   
+    shell: "systemctl stop kubelet" 
+  - name: replace old kubelet   
+    shell: "alias cp; cp /tmp/kubelet `which kubelet` -f" 
+  - name: restart kubelet   
+    shell: "systemctl daemon-reload && systemctl restart kubelet" 
+  - name: echo k8s version   
+    shell: "kubectl version" 

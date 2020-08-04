@@ -1,0 +1,12 @@
+[init]
+acp-init                         ansible_ssh_host=10.0.32.97
+
+[master]
+acp-node-01			ansible_ssh_host=10.0.32.87
+acp-node-02			ansible_ssh_host=10.0.32.139
+acp-node-03			ansible_ssh_host=10.0.32.114
+
+[all:vars]
+ansible_connection=ssh
+ansible_ssh_user=root
+#ansible_ssh_pass=""

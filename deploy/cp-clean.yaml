@@ -1,0 +1,17 @@
+- name: copy cleanup.sh 
+  hosts: "all"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: sync repo    
+    copy:
+      src={{ item }}
+      dest=/root/{{ item }}
+    with_items:
+      - cleanup.sh 
+      - ake
+  - name: echo test
+    shell: "echo {{ k8s_tag }}"    
+    register: k8s_version
+  - name: Show Debug Info
+    debug: msg={{ k8s_version.stdout_lines }}

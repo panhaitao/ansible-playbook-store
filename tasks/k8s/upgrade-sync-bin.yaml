@@ -1,0 +1,13 @@
+- name: Config Init Host
+  hosts: "{{ hosts_group }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: sync kubebin   
+    copy:
+      src=images/1.13.4/{{ item }}
+      dest=/tmp/{{ item }}
+    with_items:
+      - kubeadm
+      - kubectl
+      - kubelet

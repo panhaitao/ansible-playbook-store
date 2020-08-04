@@ -1,0 +1,7 @@
+- name: sync certs for masters
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: gen kubeadm init yaml 
+    template: src=templates/kubeadm-init-v1.11+.yaml dest=/var/spool/kubeadm-init.yaml owner=root group=root mode=0644

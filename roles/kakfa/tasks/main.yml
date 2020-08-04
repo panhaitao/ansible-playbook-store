@@ -1,0 +1,29 @@
+- name: Disable ZK Kafka
+  shell: "kubectl scale deployment {{ item }} -n alauda-system --replicas=0"
+  with_items:
+  - alauda-kafka
+  - alauda-zookeeper
+  when: inventory_hostname in groups[master_group][0]
+- name: Clean ZK data
+  shell: "rm -rf /alauda/data/zookeeper"
+  when: inventory_hostname in groups[node_group]
+- name: Set ZK Image
+  shell: "kubectl set image deployments/alauda-zookeeper -n alauda-system alauda-zookeeper={{ zk_image }}" 
+  when: inventory_hostname in groups[master_group][0]
+
+- name: Set Kafka Image
+  shell: "kubectl set image deployments/alauda-kafka -n alauda-system alauda-kafka={{ kafka_image }}" 
+  when: inventory_hostname in groups[master_group][0]
+- name: Set Kafka Env
+  shell: "kubectl set env deployment/alauda-kafka -n alauda-system {{ item }}"
+  with_items:
+  - KAFKA_HOME=/opt/kafka_2.12-2.2.1
+  - __ALAUDA_FILE_LOG_PATH__=/opt/kafka_2.12-2.2.1/logs/*.log
+  - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=6000
+  when: inventory_hostname in groups[master_group][0]
+- name: Enable ZK Kafka
+  shell: "kubectl scale deployment {{ item }} -n alauda-system --replicas=3"
+  with_items:
+  - alauda-kafka
+  - alauda-zookeeper
+  when: inventory_hostname in groups[master_group][0]

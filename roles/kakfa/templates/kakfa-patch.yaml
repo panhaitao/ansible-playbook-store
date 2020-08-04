@@ -1,0 +1,10 @@
+spec:
+  template:
+    spec:
+      containers:
+      - env:
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP

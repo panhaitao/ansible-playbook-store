@@ -1,0 +1,12 @@
+- name: set auto sync blog crond jobs
+  hosts: onwalk.net
+  user: root
+  gather_facts: yes
+  tasks:
+    - include_role:
+        name: crond
+      vars:
+        - job_name: "sync_blog_md"
+        - job_time: "1"
+        - job_user: "root"
+        - job_cmd: "git --work-tree=/blog/SoldierNote/ --git-dir=/blog/SoldierNote/.git pull https://github.com/panhaitao/SoldierNote"

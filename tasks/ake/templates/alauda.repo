@@ -1,0 +1,5 @@
+[alauda]
+baseurl = http://{{ hostvars[inventory_hostname].ansible_ssh_host }}:7000/yum
+enabled = 1
+gpgcheck = 0
+name = Alauda Centos YUM repo

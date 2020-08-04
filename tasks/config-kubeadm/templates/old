@@ -1,0 +1,32 @@
+{%- set k8s_cha = cha_ip -%}
+{%- set pkg_ip  = pkg_ip -%}
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: ClusterConfiguration
+certificatesDir: /etc/kubernetes/pki
+clusterName: kubernetes
+kubernetesVersion: v1.14.2
+controlPlaneEndpoint: "{{ k8s_cha }}:6443"
+imageRepository: "{{ pkg_ip }}:5000"
+networking:
+  dnsDomain: cluster.local
+  podSubnet: "10.244.0.0/16"
+  serviceSubnet: 10.96.0.0/12
+dns:
+  type: CoreDNS
+apiServer:
+  certSANs:
+  {% for item in groups['master'] -%}
+  - {{ item }}
+  - {{ hostvars[item].ansible_ssh_host }}
+  {% endfor -%}
+  - {{ k8s_cha }}
+etcd:
+  local:
+    serverCertSANs:
+    {% for item in groups['master'] -%}
+    - "{{ hostvars[item].ansible_ssh_host }}"
+    {% endfor -%}
+    peerCertSANs:
+    {% for item in groups['master'] -%}
+    - "{{ hostvars[item].ansible_ssh_host }}"
+    {% endfor -%}

@@ -1,0 +1,3 @@
+- name: enable ip_forward 
+  script: "files/ip_forward_enable.sh"
+  when: ip_forward |lower == 'enable'

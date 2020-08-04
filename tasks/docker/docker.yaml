@@ -1,0 +1,18 @@
+- name: install docker
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: update Repo Cache
+    command: "apt update"
+  - name: Install Required Packages
+    command: "apt install {{ item }} --allow-unauthenticated -y"
+    with_items:
+      - docker-ce
+  - name: add docker config 
+    template: src=templates/daemon.json dest=/etc/docker/daemon.json owner=root group=root mode=0644
+  - name: restart docker service 
+    shell: "systemctl restart docker"
+  - name: restart repo registry
+    shell: "docker restart repo registry"
+    ignore_errors: yes

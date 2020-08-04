@@ -1,0 +1,13 @@
+- name: gen cluster init config
+  template: src=templates/kubeadm-init.yml dest=/var/lib/kubeadm-init.yml owner=root group=root mode=0644
+
+- name: init first master
+  shell: "kubeadm init --config=/var/lib/kubeadm-init.yml --upload-certs &> $HOME/init.log"
+
+- name: Set kubectl config
+  import_tasks: set_kubectl_config.yml
+
+- name: Reinit cluster master
+  template: src=templates/kubeadm-init.yml dest=/var/lib/kubeadm-init.yml owner=root group=root mode=0644
+  notify:
+    - Renit k8s cluster

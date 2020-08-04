@@ -1,0 +1,33 @@
+- name: Prep Nebula Ca key
+  script: files/create-ca.sh
+  when: nebula_action | lower == 'create_ca'
+- name: Sign Node key
+  script: files/sign-node-key.sh {{ node_name }} {{ node_ipv4 }}
+  when: nebula_action | lower == 'sign_node'
+
+- name: Create node config dir
+  shell: "mkdir -pv /etc/nebula/"
+  when: nebula_action | lower == 'add_node'
+- name: Sync nebula
+  copy: src=files/nebula dest=/usr/bin/nebula owner=root mode=0755
+  when: (nebula_action | lower == 'add_node') and (ansible_system | lower == 'linux')
+- name: Sync cert
+  copy: src=/opt/pki/{{ item }} dest=/etc/nebula/{{ item }} owner=root mode=0400
+  with_items:
+    - ca.crt
+    - "{{ node_name }}.key"
+    - "{{ node_name }}.crt" 
+  when: nebula_action | lower == 'add_node'
+- name: Add node config
+  template: src=templates/config.yml dest=/etc/nebula/config.yml owner=root mode=0644
+  notify:
+    - start nebula daemon
+  when: nebula_action | lower == 'add_node'
+
+- name: Start nebula daemon
+  script: files/start_nebula.sh
+  register: pid_status
+  when: nebula_action | lower == 'add_node'
+
+- name: Show nebula pid info
+  debug: var=pid_status verbosity=0

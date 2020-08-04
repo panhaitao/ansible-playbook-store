@@ -1,0 +1,8 @@
+- name: Restart haproxy service
+  command: "systemctl restart {{ item }}"
+  with_items:
+    - haproxy
+- name: Enable haproxy service
+  command: "systemctl enable {{ item }}"
+  with_items:
+    - haproxy

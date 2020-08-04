@@ -1,0 +1,17 @@
+- name: k8s node upgrade 
+  hosts: "{{ group }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: stop kubelet   
+    shell: "systemctl stop kubelet" 
+  - name: replace old kubelet   
+    shell: "alias cp; cp /tmp/kubelet `which kubelet` -f" 
+  - name: restart kubelet   
+    shell: "systemctl daemon-reload && systemctl restart kubelet" 
+  - name: echo k8s version   
+    shell: "kubectl version" 
+    register: k8s_version
+    ignore_errors: yes
+  - name: Show Debug Info
+    debug: msg={{ k8s_version.stdout_lines }}

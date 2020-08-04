@@ -1,0 +1,13 @@
+- name: init etcd cluster
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: mkdir /etc/kubernetes/manifests/
+    shell: "mkdir -pv /etc/kubernetes/manifests/"
+  - name: gen etcd init script
+    template: src=templates/etcd-init.sh dest=/var/spool/etcd-init.sh owner=root group=root mode=0755
+  - name: run etcd init script
+    shell: "bash /var/spool/etcd-init.sh"
+  - name: gen etcd pod yaml 
+    template: src=templates/etcd.yaml dest=/etc/kubernetes/manifests/etcd.yaml owner=root group=root mode=0644

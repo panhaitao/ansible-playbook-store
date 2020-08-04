@@ -1,0 +1,47 @@
+{%- set pkg_ip  = pkg_ip -%}
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    scheduler.alpha.kubernetes.io/critical-pod: ""
+  creationTimestamp: null
+  labels:
+    component: etcd
+    tier: control-plane
+  name: etcd
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - etcd
+    - --name={{ inventory_hostname }}
+    - --listen-peer-urls=http://{{ hostvars[inventory_hostname].ansible_ssh_host }}:2380
+    - --initial-advertise-peer-urls=http://{{ hostvars[inventory_hostname].ansible_ssh_host }}:2380
+    - --listen-client-urls=http://{{ hostvars[inventory_hostname].ansible_ssh_host }}:2379
+    - --advertise-client-urls=http://{{ hostvars[inventory_hostname].ansible_ssh_host }}:2379
+    - --initial-cluster-token=etcd-init
+    - --initial-cluster-state=existing
+    - --data-dir=/var/lib/etcd
+    - --initial-cluster={%- for item in groups['master'] -%}{{ item }}=http://{{ hostvars[item]['ansible_ssh_host'] }}:2380{% if not loop.last %},{% endif %} {%- endfor %} 
+    image: {{ pkg_ip }}:5000/etcd-amd64:3.1.11
+    livenessProbe:
+      failureThreshold: 8
+      httpGet:
+        host: 127.0.0.1
+        path: /health
+        port: 2379
+        scheme: HTTP
+      initialDelaySeconds: 15
+      timeoutSeconds: 15
+    name: etcd
+    resources: {}
+    volumeMounts:
+    - mountPath: /var/lib/etcd
+      name: etcd
+  hostNetwork: true
+  volumes:
+  - hostPath:
+      path: /var/lib/etcd
+      type: DirectoryOrCreate
+    name: etcd
+status: {}

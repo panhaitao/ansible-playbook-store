@@ -1,0 +1,69 @@
+- name: Config Init Host
+  hosts: "{{ init_host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: clearn old config 
+    shell: 'rm /alauda/.run_chart_repo.sh /alauda/.run_kaldr.sh -f'
+  - name: Gen /alauda/.run_chart_repo.sh 
+    template: src=templates/run_chart_repo.sh dest=/alauda/.run_chart_repo.sh owner=root group=root mode=0644
+  - name: Gen /alauda/.run_kaldr.sh 
+    template: src=templates/run_kaldr.sh dest=/alauda/.run_kaldr.sh owner=root group=root mode=0644
+  #- name: Gen /alauda/.run_registry.sh 
+  #  template: src=templates/run_registry.sh dest=/alauda/.run_registry.sh owner=root group=root mode=0644
+  - name: Remove all docker continers
+    script: scripts/clean_continers.sh 
+  - name: Reconfig Init Hosts 
+    shell: 'sh /alauda/.run_chart_repo.sh && sh /alauda/.run_kaldr.sh'
+- name: Config Master Host
+  hosts: "{{ master_host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: Helm update 
+    shell: "helm repo update" 
+  - name: Helm upgrade  
+    shell: "helm upgrade alauda-ace stable/ACE" 
+  - name: sync 
+    copy:
+      src=scripts/{{ ace_tag }}-migrate.sh
+      dest=/root/{{ ace_tag }}-migrate.sh
+- name: Check k8s cluster stats
+  hosts: "{{ master_host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: wait for k8s cluster  ready
+    shell: "kubectl get pods --all-namespaces | grep -v Running | awk 'NR>1'"
+    register: cluster_stats
+    until:
+      - 'cluster_stats.stdout == ""'
+    retries: 100
+    delay: 10
+  - name: Show Debug Info
+    debug: var=cluster_stats verbosity=0
+- name: Run Migrate scripts 
+  hosts: "{{ master_host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  #- name: Run DB migrate.sh  
+  #  shell: sh /root/{{ ace_tag }}-migrate.sh 
+  #  ignore_errors: yes
+  - name: Check Migrate log
+    shell: "tail -n 50 /alauda/alauda.log"
+    register: migrate_log
+  - name: Show Debug Info
+    debug: var=migrate_log verbosity=0
+  #- name: Jakiro POD exec syncrole   
+  #  script: scripts/jakiro-exec.sh 
+  - name: Gen update_label.sh 
+    template: src=templates/update_label.sh dest=/root/update_label.sh owner=root group=root mode=0644
+  - name: Run update_label.sh  
+    shell: sh /root/update_label.sh 
+#      bash ace-2.5-migrate.sh
+#      python manage.py syncroles -o cpaas
+#      2.8:  curl -v -X PUT http://localhost:80/v3/schemas/convert_schema/view_action
+#      2.8   curl -v -X PUT http://localhost:80/v3/roles/convert_template/view_action
+#      2.8   curl -v -X PUT http://localhost:80/v3/roles/convert_roles/view_action
+#      curl -v -X PUT -u cpaas:cpaasCeb@123 http://10.213.107.209:32001/v2/kubernetes/clusters/ace/update_label

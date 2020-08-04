@@ -1,0 +1,7 @@
+- hosts: "{{ master_host }}"
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: set cluster nodes label
+      shell: "kubectl label node --overwrite {{ item }} node-role.kubernetes.io/node="
+      with_items: "{{ groups['node'] }}"

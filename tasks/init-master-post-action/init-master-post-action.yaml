@@ -1,0 +1,7 @@
+- name: init-master-post-action
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: remove taint tag for master
+    shell: "kubectl taint nodes --all node-role.kubernetes.io/master-"

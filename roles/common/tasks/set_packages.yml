@@ -1,0 +1,9 @@
+- name: Update Repo Cache
+  command: "yum makecache"
+- name: Install Required Packages
+  command: "yum install {{ item }} -y"
+  with_items:
+    - yum-utils
+    - ipvsadm
+    - sshpass
+    - jq

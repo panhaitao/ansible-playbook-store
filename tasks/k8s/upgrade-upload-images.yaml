@@ -1,0 +1,25 @@
+- name: Config Init Host
+  hosts: "{{ master_host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: sync kubebin   
+    copy:
+      src=images/1.13.4/{{ item }}
+      dest=/tmp/{{ item }}
+    with_items:
+      - kubescheduler.tar
+  - name: sync images    
+    copy:
+      src=images/1.13.4/{{ item }}
+      dest=/root/{{ item }}
+    with_items:
+      - kubescheduler.tar
+      - kubebin.tar
+      - kubeapiserver.tar
+      - kubecontroller.tar
+      - kubeproxy.tar
+      - etcd.tar
+      - coredns.tar
+  - name: Gen /root/load_img.sh 
+    template: src=templates/load_image.sh dest=/alauda/load_image.sh owner=root group=root mode=0644

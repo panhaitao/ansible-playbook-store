@@ -1,0 +1,40 @@
+- name: Sync kubebin for all nodes
+  hosts: "{{ group }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: clean tmp dir
+    shell: "rm /tmp/kube* -rvf"
+  - name: sync kubebin   
+    copy:
+      src=images/1.13.10/{{ item }}
+      dest=/tmp/{{ item }}
+    with_items:
+      - kubeadm
+      - kubectl
+      - kubelet
+- name: Sync K8s 1.13.10 images  
+  hosts: "{{ master_host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: clean tmp dir
+    shell: "mkdir -pv /tmp/k8s/ ; rm -rvf /tmp/k8s/*"
+  - name: sync images    
+    copy:
+      src=images/1.13.10/{{ item }}
+      dest=/tmp/k8s/{{ item }}
+    with_items:
+      - coredns.tar.gz
+      - etcd.tar.gz
+      - kube-apiserver.tar.gz
+      - kubebin.tar.gz
+      - kube-controller-manager.tar.gz
+      - kube-proxy.tar.gz
+      - kube-scheduler.tar.gz
+      - pause.tar.gz
+      - images.txt
+  - name: Gen /root/load_image.sh  
+    template: src=templates/load_image.sh dest=/root/load_image.sh owner=root group=root mode=0644
+  - name: Run /root/load_image.sh
+    shell: "sh /root/load_image.sh"

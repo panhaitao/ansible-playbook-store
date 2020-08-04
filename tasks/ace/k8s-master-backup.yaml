@@ -1,0 +1,13 @@
+- name: k8s host backup etcd 
+  hosts: "{{ group }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: get etcdctl
+    script: scripts/cp-etcdctl.sh 
+  - name: create backup dir 
+    shell: "mkdir -pv /tmp/backup/"
+  - name: Gen node backup script
+    template: src=templates/ace-node-backup.sh dest=/tmp/ace-node-backup.sh owner=root group=root mode=0755
+  - name: run node backup script
+    shell: "bash /tmp/ace-node-backup.sh"

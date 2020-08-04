@@ -1,0 +1,40 @@
+- name: init pkg center
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: sync repo    
+    copy:
+      src={{ item }}
+      dest=/var/spool/{{ item }}
+    with_items:
+      - repo/
+      - registry/
+      - registry.tar.gz
+      - nginx.tar.gz
+  - name: add extra repo 
+    template: src=templates/{{ item }} dest=/etc/apt/sources.list.d/{{ item }} owner=root group=root mode=0644
+    with_items:
+      - local.list
+  - name: Update Repo Cache
+    command: "apt update"
+  - name: Install kubeadm Packages
+    command: "apt install {{ item }} --allow-unauthenticated -y"
+    with_items:
+      - docker-ce
+  - name: load image
+    shell: "docker load < /var/spool/{{ item }}"
+    with_items:
+      - registry.tar.gz
+      - nginx.tar.gz
+  - name: run docker ps 
+    command: "docker ps -a" 
+    register: docker_ps_output
+  - name: clean old container
+    shell: "docker ps -a -q | xargs -t -i docker rm {} -f"
+    when: docker_ps_output != ""
+
+  - name: init registry repo
+    shell: "docker run -d -t -i -v /var/spool/registry/:/var/lib/registry --net=host --name=registry registry"
+  - name: init pkg repo
+    shell: "docker run -d -t -i -v /var/spool/repo/:/var/www/ --net=host --name=repo alpine-nginx"

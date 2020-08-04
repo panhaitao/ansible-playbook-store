@@ -1,0 +1,20 @@
+- name: add k8s pv
+  hosts: "{{ master }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: umount nas mount dir
+    shell: "umount /tmp/test-mount"
+    ignore_errors: yes
+  - name: mkdir tmp mount dir
+    shell: "mkdir -pv /tmp/test-mount"
+  - name: test mount
+    shell: "mount {{ nas_ip}}:{{nas_path}} /tmp/test-mount"
+  - name: set nas path perm 777
+    shell: "chmod 777 -Rv /tmp/test-mount/"
+  - name: umount nas mount dir
+    shell: "umount /tmp/test-mount"
+  - name: add k8s pv config
+    template: src=templates/pv.yaml dest=/tmp/{{ pv_name }} owner=root group=root mode=0644
+  - name: apply new pv
+    shell: "kubectl apply -f /tmp/{{ pv_name }}" 

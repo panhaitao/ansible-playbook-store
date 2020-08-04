@@ -1,0 +1,11 @@
+- name: Sync DIR and update fstab 
+  hosts: all
+  user: root
+  gather_facts: yes
+  tasks:
+    - include_role:
+        name: os
+      vars:
+        - src_dir: "sync_blog_md"
+        - dest_dir: "sync_blog_md"
+        - mount_type: "bind"

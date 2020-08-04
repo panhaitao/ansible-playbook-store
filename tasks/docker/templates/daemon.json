@@ -1,0 +1,11 @@
+{
+    "insecure-registries": [ "{{ registry }}", "{{ init_ip }}:60080" ],
+    "graph": "/var/lib/docker",
+    "exec-opts": ["native.cgroupdriver=cgroupfs"],
+    "storage-driver": "overlay2",
+    "log-driver":"json-file",
+    "log-opts":{
+         "max-size":"50m",
+         "max-file":"2"                    
+      }
+}

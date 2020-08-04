@@ -1,0 +1,19 @@
+- name: upload image 
+  hosts: "{{ master_host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: sync images    
+    copy:
+      src=pkg/{{ item }}
+      dest=/tmp/{{ item }}
+    with_items:
+      - nsx-ncp-rhel-2.4.0.12511604.tar
+      - ncp-deployment.yml
+      - nsx-node-agent-ds.yml
+  - name: Gen /tmp/load_image.sh 
+    template: src=templates/load_image.sh dest=/tmp/load_image.sh owner=root group=root mode=0644
+  - name: run /tmp/load_image.sh 
+    shell: "sh /tmp/load_image.sh"
+  - name: delete daemonsets kube-flannel
+    shell: "kubectl delete ds kube-flannel -n kube-system"

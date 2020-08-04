@@ -1,0 +1,78 @@
+- name: check os stats
+  hosts: all
+  user: root
+  gather_facts: no
+  tasks:
+  - name: check_os_stats
+    script: scripts/check_os_stats.sh 
+    register: check_os_stats
+
+  - name: check nevermore logs
+    shell: "du -hs /buffer/alauda/"
+    ignore_errors: yes
+    register: check_node_log
+
+#  - name: Show all OS stats
+#    vars:
+#      msg: |
+#           "host ip: {{ check_os_stats.stdout }} "
+#           "node log: {{ check_node_log.stdout_lines }} "
+#    debug:
+#      msg: "{{ msg.split('\n') }}"
+
+  - name: get os status
+    set_fact:
+      os_status: "{{ check_os_stats.stdout }}"
+
+  - name: get log status
+    set_fact:
+      log_status: "{{ check_node_log.stdout_lines }}"
+
+- name: check cluster stats
+  hosts: "{{ master }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: check_cluster_nfs_pv
+    script: scripts/check_cluster_nfs_pv.sh 
+    register: cluster_nas_volums
+
+  - name: check k8s cluster status
+    shell: "kubectl get cs"
+    register: cluster_status
+
+  - name: check k8s nodes
+    shell: "kubectl get nodes"
+    register: node_status
+
+  - name: check k8s pods status
+    shell: "kubectl get pods --all-namespaces | grep -v Running"
+    register: pods_status
+
+  - name: Show cluser stats
+    vars:
+      msg: |
+           OS status:
+           ------------------------------------
+           {% for item in groups['all'] %} 
+             {{ hostvars[item].os_status }}
+             {{ hostvars[item].log_status }}
+           {% endfor %}
+
+           cluster_status:
+           ------------------------------------
+           "{{ cluster_status.stdout }}"
+
+           node_status:
+           ------------------------------------
+           "{{ node_status.stdout }}"
+
+           pods_status:
+           ------------------------------------
+           "{{ pods_status.stdout }}"
+
+           cluster_nas_volums_info:
+           ------------------------------------
+           "{{ cluster_nas_volums.stdout }}"
+    debug:
+      msg: "{{ msg.split('\n') }}"

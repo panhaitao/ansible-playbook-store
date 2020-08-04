@@ -1,0 +1,44 @@
+- name: set all k8s nodes
+  hosts: all
+  user: root
+  gather_facts: yes
+  tasks:
+    - include_role:
+        name: common
+      vars:
+        firewalld: 'disable' 
+        swapfs: 'disable'
+        ipvs: 'enable'
+        ip_forward: 'enable'
+        selinux: 'disable'
+        update_etc_hosts: 'yes'
+        update_etc_hostname: 'yes'
+    - include_role:
+        name: docker
+      vars:
+        #docker镜像仓库，替换为实际需要添加的即可
+        registry: 127.0.0.1:5000
+        #docker 版本
+        version: 19.03.5
+        repo: "http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo"
+        #master_group，node_group 要和inventory hosts 中定义的一致
+        master_group: master
+        node_group: node
+    - include_role:
+        name: k8s
+      vars:
+        cluster: init
+        master_group: master
+        node_group: node
+        version: 1.15.6
+        pkg_repo: http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
+        #api_vip 这个是k8s_apiserver_LB, 如果使用了集群外提供的LB，填入对应的vip ; 如果使用集群内的自建LB，填入对应即可lb_host_ip即可
+        api_vip: 172.17.142.53
+        #image_repo 是k8s 组件镜像仓库，image_flannel 是 flannel 的国内镜像地址
+        image_repo: registry.cn-hangzhou.aliyuncs.com/google_containers
+        image_flannel: registry.cn-beijing.aliyuncs.com/xz/flannel:v0.11.0-amd64
+        domain: cluster.local
+        #service_subnet， pod_subnet 分别是k8s 集群的service网段和pod网段，根据实际情况修改保证和主机网络不冲突即可
+        service_subnet: "10.96.0.0/16"
+        pod_subnet: "10.10.0.0/16"
+        subnet_type: "vxlan"

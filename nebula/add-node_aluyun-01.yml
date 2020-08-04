@@ -1,0 +1,12 @@
+- name: set all k8s nodes
+  hosts: aluyun-01
+  user: root
+  gather_facts: no
+  tasks:
+    - include_role:
+        name: vpn-nebula
+      vars:
+        nebula_action: add_node
+        lighthouse_ip: 192.168.168.1
+        lighthouse_endpoint: onwalk.net:4242
+        node_name: aluyun-01

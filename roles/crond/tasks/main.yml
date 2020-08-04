@@ -1,0 +1,9 @@
+- name: "Create /etc/cron.d/{{ job_name }}"
+  cron:
+    name: "{{ job_name }}"
+    minute: "{{ job_time }}"
+    user: "{{ job_user }}"
+    job: "{{ job_cmd }}"
+    cron_file: "{{ job_name }}"
+- name: restart crond
+  shell: "systemctl restart crond"

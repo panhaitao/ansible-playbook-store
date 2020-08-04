@@ -1,0 +1,5 @@
+- name: gen cni kube flannel config
+  template: src=templates/kube-flannel.yml dest=/var/lib/kube-flannel.yml owner=root group=root mode=0644
+
+- name: init first master
+  shell: "kubectl apply -f /var/lib/kube-flannel.yml"

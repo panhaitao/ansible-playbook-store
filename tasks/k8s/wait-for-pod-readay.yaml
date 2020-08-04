@@ -1,0 +1,17 @@
+- name: Config Init Host
+  hosts: "{{ master_host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: wait for k8s cluster  ready  
+    shell: "kubectl get pods --all-namespaces | grep -v Running | awk 'NR>1'"
+    register: cluster_stats
+    until:
+      - 'cluster_stats.stdout == ""'
+    retries: 20
+    delay: 5 
+  - name: Show Debug Info
+    debug: var=cluster_stats verbosity=0
+    
+    
+

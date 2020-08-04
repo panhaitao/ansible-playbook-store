@@ -1,0 +1,5 @@
+[alauda]
+name=alauda
+baseurl=http://{{ init_ip }}:7000/yum/
+gpgcheck=0
+enabled=1

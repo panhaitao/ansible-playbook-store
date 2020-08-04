@@ -1,0 +1,32 @@
+- name: Install K8S packages  
+  import_tasks: set_k8s_install.yml
+  when: (inventory_hostname in groups[master_group]) or (inventory_hostname in groups[node_group])  
+
+- name: Init K8S cluster
+  import_tasks: set_k8s_init.yml
+  when: (inventory_hostname in groups[master_group][0]) and ( cluster | lower == 'init')
+  ignore_errors: yes
+
+- name: Set K8S CNI  
+  import_tasks: set_cni_flannel.yml 
+  when: (inventory_hostname in groups[master_group][0]) and ( cluster | lower == 'init')
+
+- name: Get join CMD 
+  import_tasks: get_join_cmd.yml
+  when: (inventory_hostname in groups[master_group][0]) and ( cluster | lower == 'init')
+
+- name: Check Pod Status 
+  import_tasks: check_pods_status.yml 
+  when: (inventory_hostname in groups[master_group][0]) and ( cluster | lower == 'init')
+
+- name: Join K8S master
+  include_tasks: set_k8s_join_master.yml
+  when: ( inventory_hostname in groups[master_group] ) and ( inventory_hostname not in groups[master_group][0] )
+
+- name: Join K8S node
+  include_tasks: set_k8s_join_node.yml
+  when: (inventory_hostname in groups[node_group]) and ( cluster | lower == 'init')
+
+- name: Set K8S node label
+  import_tasks: set_k8s_node_label.yml
+  when: (inventory_hostname in groups[master_group][0]) and ( cluster | lower == 'init')

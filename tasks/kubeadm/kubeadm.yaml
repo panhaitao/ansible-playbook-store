@@ -1,0 +1,17 @@
+- name: install kubeadm
+  hosts: "{{ hostgroup }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: Install kubeadm Packages
+    command: "apt install {{ item }} --allow-unauthenticated -y"
+    with_items:
+      - kubeadm
+      - kubectl
+      - kubelet
+  - name: update kubeadm.conf
+    template: src=templates/10-kubeadm-1.11+.conf dest=/etc/systemd/system/kubelet.service.d/10-kubeadm.conf owner=root group=root mode=0644
+  - name: systemd daemon-reload 
+    shell: "systemctl daemon-reload"
+  - name: restart kubelet service 
+    shell: "systemctl restart kubelet"

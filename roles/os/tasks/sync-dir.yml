@@ -1,0 +1,8 @@
+- name: mkdir src dir  
+  shell: "mkdir -pv /buffer"
+- name: mkdir dest dir  
+  shell: "mkdir -pv /alauda/buffer"
+- name: Do Sync And Update etc fstab
+  script: files/do_sync_and_update_etc_fstab.sh
+- name: Check mount point
+  shell: "mount -a"

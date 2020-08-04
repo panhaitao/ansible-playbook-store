@@ -1,0 +1,5 @@
+- name: update /etc/hostname
+  template: src=templates/hostname dest=/etc/hostname owner=root group=root mode=0644
+
+- name: Set hostname
+  shell: "hostname -F /etc/hostname"

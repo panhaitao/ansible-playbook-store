@@ -1,0 +1,12 @@
+[init]
+bs-init                         ansible_ssh_host=118.24.232.220
+
+[master]
+bs-node-01			ansible_ssh_host=129.28.190.174
+bs-node-02			ansible_ssh_host=118.24.234.22
+bs-node-03			ansible_ssh_host=129.28.179.89
+
+[all:vars]
+ansible_connection=ssh
+ansible_ssh_user=root
+#ansible_ssh_pass=""

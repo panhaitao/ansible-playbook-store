@@ -1,0 +1,19 @@
+- name: create dir
+  shell: "mkdir -pv /etc/docker/"
+- name: add docker config
+  template: src=templates/daemon.json dest=/etc/docker/daemon.json owner=root group=root mode=0644
+  notify:
+    - Restart docker service
+
+- name: Ensure Dockerd is Running
+  shell: "systemctl restart docker && systemctl enable docker"
+
+- name: waiting for dockerd ready
+  shell: "systemctl status docker"
+  register: docker_stats
+  until:
+    - 'docker_stats.rc == 0'
+  retries: 6
+  delay: 10
+- name: Show Debug Info
+  debug: var=docker_stats verbosity=0

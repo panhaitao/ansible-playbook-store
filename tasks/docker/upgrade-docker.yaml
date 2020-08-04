@@ -1,0 +1,48 @@
+- name: Prep for upgrade Node Docker
+  hosts: "{{ master_host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: Cordon Node 
+    shell: "kubectl cordon {{ node }}" 
+  - name: Drain Node 
+    shell: "kubectl drain {{ node }} --ignore-daemonsets --delete-local-data=false" 
+  - name: Echo Running pod of Node
+    shell: "kubectl get po -o wide --all-namespaces | grep {{ node }}"
+    register: node_pod_stat
+  - name: Show Debug Info
+    debug: var=node_pod_stat verbosity=0
+- name: Upgrade docker Vesion
+  hosts: "{{ node }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: create /etc/yum.repos.d/
+    shell: "mkdir -pv /etc/yum.repos.d/"
+  - name: Gen yum repo 
+    template: src=templates/alauda.repo dest=/etc/yum.repos.d/alauda.repo owner=root group=root mode=0644
+  - name: Remove PKG for Cebbank OS 
+    shell: "yum remove libselinux-devel libsepol-devel -y"
+  - name: Update repo index
+    shell: "yum makecache"
+  - name: Upgrade docker
+    shell: "yum install docker-ce docker-ce-cli -y"
+  - name: restart service
+    shell: "systemctl restart docker"
+  - name: Show  Docker version
+    shell: "docker version"
+    register: docker_version
+  - name: Show Debug Info
+    debug: var=docker_version verbosity=0
+- name: Uncordon Node
+  hosts: "{{ master_host }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: Uncordon Node 
+    shell: "kubectl uncordon {{ node }}" 
+  - name: Echo Running pod of Node
+    shell: "kubectl get po -o wide --all-namespaces | grep {{ node }}"
+    register: node_pod_stat
+  - name: Show Debug Info
+    debug: var=node_pod_stat verbosity=0

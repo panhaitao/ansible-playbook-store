@@ -1,0 +1,38 @@
+- name: Init NSX-T cni plugin
+  hosts: "{{ group }}"
+  user: root
+  gather_facts: no
+  tasks:
+  - name: Delete net interface cni 
+    shell: "ip link delete cni"
+    ignore_errors: yes
+  - name: Delete net interface flannel.1 
+    shell: "ip link delete flannel.1"
+    ignore_errors: yes
+  - name: Restart networking 
+    shell: "systemctl restart network"
+  - name: Clean CNI flannel config 
+    shell: "rm -f /etc/cni/net.d/10-flannel.conflist" 
+    ignore_errors: yes
+  - name: mkdir /etc/cni/net.d
+    shell: "mkdir -pv /etc/cni/net.d"
+  - name: sync pkgs 
+    copy: src=pkg/{{ item }} dest=/tmp/{{ item }} owner=root group=root mode=0644
+    with_items:
+      - nsx-cni-2.4.0.12511604-1.x86_64.rpm
+      - kmod-openvswitch-2.10.2.rhel75.12344490-1.el7.x86_64.rpm
+      - openvswitch-2.10.2.rhel75.12344490-1.x86_64.rpm
+  - name: install pkgs
+    shell: "cd /tmp && yum localinstall  kmod-openvswitch-*.rpm openvswitch-*.rpm nsx-cni-*.rpm -y"
+  - name: Enable openvswitch services
+    shell: "systemctl enable openvswitch && systemctl start openvswitch"
+  - name: OVS add br
+    shell: "ovs-vsctl add-br br-int"
+  - name: OVS add port 
+    shell: "ovs-vsctl add-port br-int ens256 -- set Interface ens256 ofport_request=1"
+  - name: OVS list interface 
+    shell: "ovs-vsctl --columns=ofport list interface ens256"
+  - name: OVS set br-int up
+    shell: "ip link set br-int up"
+  - name: OVS set ens256 up
+    shell: "ip link set ens256 up"

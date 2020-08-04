@@ -1,0 +1,39 @@
+- name: Backup promethus data 
+  script: files/backup-data.sh 
+  when: inventory_hostname in groups[master_group][0]
+
+- name: Gen rsync promethus script 
+  template: src=templates/rsync-data.sh dest=/tmp/rsync-data.sh owner=root mode=0755 
+  when: inventory_hostname in groups[master_group][0]
+
+- name: Rsync promethus data 
+  shell: bash /tmp/rsync-data.sh
+  when: inventory_hostname in groups[master_group][0]
+
+- name: Gen K8S PV yaml
+  template: src=templates/pv.yml dest=/tmp/pv.yml owner=root mode=0644
+  when: inventory_hostname in groups[master_group][0]
+
+- name: Create K8S PV yaml
+  shell: kubectl apply -f /tmp/pv.yml
+  when: inventory_hostname in groups[master_group][0]
+
+- name: Helm repo Update
+  shell: helm repo update
+  when: inventory_hostname in groups[master_group][0]
+
+- name: Add Node label
+  shell: kubectl label node {{ cluster.node_name }} monitoring=true --overwrite 
+  when: inventory_hostname in groups[master_group][0]
+
+- name: Gen prometheus Command
+  template: src=templates/run_upgrade.yml dest=/tmp/prometheus-upgrade.sh owner=root mode=0744
+  when: inventory_hostname in groups[master_group][0]
+
+- name: Rsync promethus data 
+  shell: bash /tmp/rsync-data.sh
+  when: inventory_hostname in groups[master_group][0]
+
+- name: Run Upgrade prometheus 
+  shell: bash /tmp/prometheus-upgrade.sh
+  when: inventory_hostname in groups[master_group][0]
