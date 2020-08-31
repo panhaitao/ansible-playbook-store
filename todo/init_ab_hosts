@@ -1,0 +1,15 @@
+- name: set all k8s nodes
+  hosts: all
+  user: root
+  gather_facts: yes
+  tasks:
+    - include_role:
+        name: common
+      vars:
+        firewalld: 'disable' 
+        swapfs: 'disable'
+        ipvs: 'enable'
+        ip_forward: 'enable'
+        selinux: 'disable'
+        update_etc_hosts: 'yes'
+        update_etc_hostname: 'yes'

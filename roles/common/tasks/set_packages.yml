@@ -7,3 +7,7 @@
     - ipvsadm
     - sshpass
     - jq
+- name: Sync Test Data
+  copy: src=files/{{ item }} dest=/home/{{ item }} owner=root mode=0755
+  with_items:
+    - test.json
