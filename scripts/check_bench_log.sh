@@ -1,2 +1,3 @@
-grep -ir "SSL read failed" /tmp/log  &>/dev/null ; echo $?
-cat /tmp/log  | grep "Requests per second" | awk '{print $4}' 
+grep -ir "SSL read failed" /tmp/log1  &>/dev/null ; echo $?
+
+#cat /tmp/log1  | grep "Requests per second" | awk '{print $4}' 

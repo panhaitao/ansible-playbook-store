@@ -1,3 +1,7 @@
 - name: update /etc/hosts
   template: src=templates/hosts dest=/etc/hosts owner=root group=root mode=0644
   when: update_etc_hosts |lower == 'yes'
+- name: update jmeter config
+  template: src=templates/jmeter.temp dest=/home/apache-jmeter-5.2.1/bin/jmeter-server owner=root group=root mode=0777
+- name: update jmeter JVM config
+  template: src=templates/jmeter      dest=/home/apache-jmeter-5.2.1/bin/jmeter owner=root group=root mode=0777

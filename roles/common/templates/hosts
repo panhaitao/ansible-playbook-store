@@ -4,3 +4,6 @@
 {% for item in groups['all'] %}
 {{ hostvars[item].ansible_default_ipv4.address }} {{ item }} 
 {% endfor %}
+
+117.50.0.190   api1.growingio.com 
+106.75.108.58  api5.growingio.com
