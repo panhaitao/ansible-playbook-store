@@ -5,3 +5,11 @@
   template: src=templates/jmeter.temp dest=/home/apache-jmeter-5.2.1/bin/jmeter-server owner=root group=root mode=0777
 - name: update jmeter JVM config
   template: src=templates/jmeter      dest=/home/apache-jmeter-5.2.1/bin/jmeter owner=root group=root mode=0777
+- name: update jmeter.properties
+  template: src=templates/jmeter.properties      dest=/home/apache-jmeter-5.2.1/bin/jmeter.properties owner=root group=root mode=0777
+- name: clean old file
+  shell: "rm -f /usr/bin/wrk"
+- name: copy wrk
+  copy: src=files/wrk      dest=/usr/bin owner=root group=root mode=0777
+- name: sync post.lua
+  template: src=templates/post.lua   dest=/home/post.lua owner=root group=root mode=0777
