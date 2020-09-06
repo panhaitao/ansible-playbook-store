@@ -1,0 +1,27 @@
+.masonry {
+                width: 100%;
+                margin-top: 50px;
+                position:relative;
+            }
+.item {
+    z-index: 10;
+    transition: 0.25s;
+    overflow: hidden;
+    position: absolute;
+}
+.item img{
+    width: 100%;
+    height:100%;
+    transition: 0.25s;
+}
+.item:hover img{
+    z-index: 100;
+    transition: 0.25s;
+    overflow: hidden;
+    animation: bounceIn 0.25s ease-in 2 alternate;
+}
+@keyframes bounceIn{
+    100% {
+        transform: scale(1.07);
+    }
+}
