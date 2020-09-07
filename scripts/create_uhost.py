@@ -25,7 +25,7 @@ def main():
             "SecurityGroupId": "firewall-4fntbzvk",
             "Zone": "cn-bj2-03",
             "ImageId": "uimage-i2pcb2i3",
-            "Password": "a4h3ljbn",
+            "Password": "xxxxxxx",
             "LoginMode": "Password",
             "Name": "test-",
             "CPU": 8,
