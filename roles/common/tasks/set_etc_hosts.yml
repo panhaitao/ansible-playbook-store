@@ -7,6 +7,8 @@
   template: src=templates/jmeter      dest=/home/apache-jmeter-5.2.1/bin/jmeter owner=root group=root mode=0777
 - name: update jmeter.properties
   template: src=templates/jmeter.properties      dest=/home/apache-jmeter-5.2.1/bin/jmeter.properties owner=root group=root mode=0777
+- name: run jmeter worker agent
+  script: files/run_jemter_work.sh
 - name: clean old file
   shell: "rm -f /usr/bin/wrk"
 - name: copy wrk
