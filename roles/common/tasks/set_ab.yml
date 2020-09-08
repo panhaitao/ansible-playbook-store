@@ -3,7 +3,7 @@
 - name: Install Required Packages
   command: "yum install {{ item }} -y"
   with_items:
-    - httpd-tool
+    - httpd-tools
 - name: Sync Test Data
   copy: src=files/{{ item }} dest=/home/{{ item }} owner=root mode=0755
   with_items:
