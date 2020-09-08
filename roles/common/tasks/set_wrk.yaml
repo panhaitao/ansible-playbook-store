@@ -1,0 +1,9 @@
+- name: clean old file
+  shell: "rm -f /usr/bin/wrk"
+  when: set_wrk |lower == 'yes'
+- name: copy wrk
+  copy: src=files/wrk      dest=/usr/bin owner=root group=root mode=0777
+  when: set_wrk |lower == 'yes'
+- name: sync post.lua
+  template: src=templates/post.lua   dest=/home/post.lua owner=root group=root mode=0777
+  when: set_wrk |lower == 'yes'

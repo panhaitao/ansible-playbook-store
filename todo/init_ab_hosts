@@ -6,10 +6,9 @@
     - include_role:
         name: common
       vars:
-        firewalld: 'disable' 
-        swapfs: 'disable'
-        ipvs: 'enable'
-        ip_forward: 'enable'
-        selinux: 'disable'
         update_etc_hosts: 'yes'
         update_etc_hostname: 'yes'
+        set_ab: 'yes'
+        set_jmeter: 'yes' 
+        set_wrk: 'yes'
+        set_ab: 'yes'

@@ -1,0 +1,12 @@
+- name: update jmeter config
+  template: src=templates/jmeter-server dest=/home/apache-jmeter-5.2.1/bin/jmeter-server owner=root group=root mode=0777
+  when: set_jmeter |lower == 'yes'
+- name: update jmeter JVM config
+  template: src=templates/jmeter dest=/home/apache-jmeter-5.2.1/bin/jmeter owner=root group=root mode=0777
+  when: set_jmeter |lower == 'yes'
+- name: update jmeter.properties
+  template: src=templates/jmeter.properties dest=/home/apache-jmeter-5.2.1/bin/jmeter.properties owner=root group=root mode=0777
+  when: set_jmeter |lower == 'yes'
+- name: run jmeter worker agent
+  script: files/run_jemter_work.sh
+  when: set_jmeter |lower == 'yes'

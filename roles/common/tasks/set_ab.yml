@@ -1,0 +1,10 @@
+- name: Update Repo Cache
+  command: "yum makecache"
+- name: Install Required Packages
+  command: "yum install {{ item }} -y"
+  with_items:
+    - httpd-tool
+- name: Sync Test Data
+  copy: src=files/{{ item }} dest=/home/{{ item }} owner=root mode=0755
+  with_items:
+    - test.json
