@@ -36,8 +36,8 @@
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">api-test-xjh.growingio.com</stringProp>
-          <stringProp name="HTTPSampler.port">4433</stringProp>
+          <stringProp name="HTTPSampler.domain">api-test.example.com</stringProp>
+          <stringProp name="HTTPSampler.port">433</stringProp>
           <stringProp name="HTTPSampler.protocol">https</stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
           <stringProp name="HTTPSampler.path">/v3/0a1b4118dd954ec3bcc69da5138bdb96/web/pv?stm=1597991043684</stringProp>
