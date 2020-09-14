@@ -13,8 +13,8 @@ def main():
     client = Client({
         "region": "cn-bj2",
         "project_id": "org-5wakzh",
-        "public_key": ""
-        "private_key": ""
+        "public_key": "",
+        "private_key": "",
         "base_url": "https://api.ucloud.cn",
     })
 
@@ -25,7 +25,7 @@ def main():
             "SecurityGroupId": "firewall-4fntbzvk",
             "Zone": "cn-bj2-03",
             "ImageId": "uimage-i2pcb2i3",
-            "Password": "xxxxxxx",
+            "Password": "",
             "LoginMode": "Password",
             "Name": "test-",
             "CPU": 8,
