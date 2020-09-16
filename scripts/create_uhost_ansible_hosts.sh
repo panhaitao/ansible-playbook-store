@@ -1,6 +1,7 @@
 #!/bin/bash
 
 hosts_name=http_load
+mkdir -pv hosts
 
 cat > hosts/$hosts_name <<EOF  
 [all]

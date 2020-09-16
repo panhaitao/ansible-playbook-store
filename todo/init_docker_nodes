@@ -1,0 +1,14 @@
+- name: init docker nodes
+  hosts: all
+  user: root
+  gather_facts: yes
+  tasks:
+    - include_role:
+        name: docker
+      vars:
+        host_group: all
+        enable_metrics: true
+        repo: 'http://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo' 
+        version: '19.03.9'
+        registry:
+          - 127.0.0.1:5000 
